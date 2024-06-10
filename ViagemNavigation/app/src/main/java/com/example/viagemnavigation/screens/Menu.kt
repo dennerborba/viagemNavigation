@@ -45,7 +45,7 @@ fun NavigationBarS(navController: NavController, user: String?){
                 arguments = listOf(navArgument("user") { type = NavType.StringType })
             ) { backStackEntry ->
                 val userArg = backStackEntry.arguments?.getString("user")
-                Home(navController = navController, user = userArg)
+                Home(navController = navController, user = user?:userArg)
             }
             composable("viagem") { Viagem(navController = navController) }
             composable("about") { AboutPage(navController = navController) }

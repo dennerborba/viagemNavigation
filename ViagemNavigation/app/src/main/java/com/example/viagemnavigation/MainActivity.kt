@@ -156,7 +156,7 @@ fun FormLogin(context: Context, navController: NavController){
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
             Button(onClick = {
                 if (username == "admin" && password == "admin"){
-                    navController.navigate("home/$username")
+                    navController.navigate("menu/$username")
                 } else {
                     context.toast("Usuário ou senha incorretos!")
                 }
