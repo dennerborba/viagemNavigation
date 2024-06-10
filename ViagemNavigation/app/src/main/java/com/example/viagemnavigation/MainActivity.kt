@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,17 +14,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.SnackbarDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,7 +55,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = Color.LightGray
                 ) {
                     Navigation()
                 }
@@ -56,15 +64,17 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormLogin(context: Context, navController: NavController){
-    var user = remember {
-        mutableStateOf(value = "")
+    var username by remember {
+        mutableStateOf("")
     }
-    var password = remember {
-        mutableStateOf(value = "")
+    var password by remember {
+        mutableStateOf("")
     }
-    var stringPassword = remember {
+    var stringPassword by remember {
         mutableStateOf(false)
     }
     Column (
@@ -86,19 +96,19 @@ fun FormLogin(context: Context, navController: NavController){
                 .padding(bottom = 4.dp)
         )
         OutlinedTextField(
-            value = user.value,
-            onValueChange = {user.value = it},
+            value = username,
+            onValueChange = {username = it},
             label = {
                 Text(
                     text = "Usuário",
                     fontSize = 24.sp,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
-            }, modifier = Modifier
+            },
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
-        )
-
+                .padding(bottom = 8.dp)
+            )
         Text(
             text = "Senha",
             textAlign = TextAlign.Center,
@@ -107,8 +117,8 @@ fun FormLogin(context: Context, navController: NavController){
                 .padding(bottom = 8.dp)
         )
         OutlinedTextField(
-            value = password.value,
-            onValueChange = {password.value = it},
+            value = password,
+            onValueChange = {password = it},
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
@@ -122,16 +132,16 @@ fun FormLogin(context: Context, navController: NavController){
                 keyboardType = KeyboardType.Password
             ),
             visualTransformation =
-            if (stringPassword.value)
+            if (stringPassword)
                 VisualTransformation.None
             else
                 PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(onClick = {
-                    stringPassword.value = !stringPassword.value
+                    stringPassword = !stringPassword
                 }
                 ) {
-                    if (stringPassword.value)
+                    if (stringPassword)
                         Icon(
                             painterResource(id = R.drawable.open_eye), ""
                         )
@@ -145,13 +155,13 @@ fun FormLogin(context: Context, navController: NavController){
 
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
             Button(onClick = {
-                if (user.value == "admin" && password.value == "admin"){
-                    navController.navigate("home")
+                if (username == "admin" && password == "admin"){
+                    navController.navigate("home/$username")
                 } else {
                     context.toast("Usuário ou senha incorretos!")
                 }
             }, colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary, contentColor = Color.White
+                containerColor = Color.DarkGray, contentColor = Color.White
             ), modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 18.dp)
@@ -164,7 +174,7 @@ fun FormLogin(context: Context, navController: NavController){
         Button(onClick = {
             navController.navigate("register")
         }, colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondary, contentColor = Color.White
+            containerColor = Color.DarkGray, contentColor = Color.White
         ), modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp)
