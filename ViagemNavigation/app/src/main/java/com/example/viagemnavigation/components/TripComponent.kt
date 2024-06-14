@@ -38,6 +38,7 @@ fun ValueInput(value: String, onValueChanged: (String) -> Unit) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChanged,
+        singleLine = true,
         label = {Text("Orçamento") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )

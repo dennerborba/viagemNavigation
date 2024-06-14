@@ -27,7 +27,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.viagemnavigation.components.Viagem
+import com.example.viagemnavigation.components.CadastroViagem
+import com.example.viagemnavigation.model.TripViewModel
 
 
 @Composable
@@ -39,16 +40,16 @@ fun NavigationBarS(navController: NavController, user: String?){
         NavHost(navController,
             startDestination = "home/$user",
             modifier = Modifier.padding(innerPadding)
-        ){
-            composable(
+        ){ composable (
                 route = "home/{user}",
                 arguments = listOf(navArgument("user") { type = NavType.StringType })
             ) { backStackEntry ->
                 val userArg = backStackEntry.arguments?.getString("user")
                 Home(navController = navController, user = user?:userArg)
             }
-            composable("viagem") { Viagem(navController = navController) }
+            composable("triplist") { TripScreen(navController = navController, TripViewModel()) }
             composable("about") { AboutPage(navController = navController) }
+            composable("cadviagem") { CadastroViagem(navController = navController,TripViewModel())}
         }
     }
 }
@@ -78,10 +79,10 @@ fun NavigationBottom(navController: NavController, user: String?){
             selected = selectedItem == 1,
             onClick = {
                       selectedItem = 1
-                      navController.navigate("viagem")
+                      navController.navigate("triplist")
             },
-            icon = { Icon(Icons.Filled.LocationOn, contentDescription = "Viagem") },
-            label = { Text(text = "Viagem")}
+            icon = { Icon(Icons.Filled.LocationOn, contentDescription = "Viagens") },
+            label = { Text(text = "Viagens")}
         )
 
         BottomNavigationItem(

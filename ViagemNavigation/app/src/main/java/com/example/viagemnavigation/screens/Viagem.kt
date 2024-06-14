@@ -1,5 +1,6 @@
 package com.example.viagemnavigation.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,17 +25,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.viagemnavigation.model.Trip
 import com.example.viagemnavigation.model.TripType
+import com.example.viagemnavigation.model.TripViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
 
 @Composable
-
-fun Viagem(navController: NavController){
+fun CadastroViagem(navController: NavController, tripViewModel: TripViewModel = viewModel()){
     val snackbarHostState = remember { SnackbarHostState()}
     val trip = remember {
         mutableStateOf(
@@ -65,11 +67,8 @@ fun Viagem(navController: NavController){
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Button(onClick = {navController.navigate("login")}) {
-                            Text("<--")
-                        }
                         Text(
-                            text = "Nova Viagem",
+                            text = "Cadastrar Nova Viagem",
                             modifier = Modifier.weight(0.1f),
                             textAlign = TextAlign.Center
                         )
@@ -116,6 +115,8 @@ fun Viagem(navController: NavController){
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = {
+                            tripViewModel.saveTrip(trip.value)
+                            Log.d("TripScreen", "Trip saved button clicked: ${trip.value}")
                             CoroutineScope(Dispatchers.Main).launch {
                                 snackbarHostState.showSnackbar("Viagem Registrada!")
                             }
