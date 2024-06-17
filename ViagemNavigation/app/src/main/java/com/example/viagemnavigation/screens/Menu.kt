@@ -72,7 +72,7 @@ fun NavigationBottom(navController: NavController, user: String?){
                 navController.navigate("home/$user")
                       },
             icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-            label = { Text(text = "Home")}
+            label = { Text(text = "Home")},
         )
 
         BottomNavigationItem(
