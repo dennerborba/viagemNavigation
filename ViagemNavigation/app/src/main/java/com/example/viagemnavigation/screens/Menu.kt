@@ -28,7 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.viagemnavigation.components.CadastroViagem
-import com.example.viagemnavigation.model.TripViewModel
+
 
 
 @Composable
@@ -47,9 +47,9 @@ fun NavigationBarS(navController: NavController, user: String?){
                 val userArg = backStackEntry.arguments?.getString("user")
                 Home(navController = navController, user = user?:userArg)
             }
-            composable("triplist") { TripScreen(navController = navController, TripViewModel()) }
+            composable("triplist") { TripScreen(navController = navController) }
             composable("about") { AboutPage(navController = navController) }
-            composable("cadviagem") { CadastroViagem(navController = navController,TripViewModel())}
+            composable("cadviagem") { CadastroViagem(navController = navController)}
         }
     }
 }

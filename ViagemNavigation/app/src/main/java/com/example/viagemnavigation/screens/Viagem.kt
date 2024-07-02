@@ -29,14 +29,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.viagemnavigation.model.Trip
 import com.example.viagemnavigation.model.TripType
-import com.example.viagemnavigation.model.TripViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
 
 @Composable
-fun CadastroViagem(navController: NavController, tripViewModel: TripViewModel = viewModel()){
+fun CadastroViagem(navController: NavController){
     val snackbarHostState = remember { SnackbarHostState()}
     val trip = remember {
         mutableStateOf(
@@ -115,7 +114,6 @@ fun CadastroViagem(navController: NavController, tripViewModel: TripViewModel = 
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = {
-                            tripViewModel.saveTrip(trip.value)
                             Log.d("TripScreen", "Trip saved button clicked: ${trip.value}")
                             CoroutineScope(Dispatchers.Main).launch {
                                 snackbarHostState.showSnackbar("Viagem Registrada!")

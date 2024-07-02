@@ -1,5 +1,7 @@
 package com.example.viagemnavigation.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,10 +37,11 @@ import com.example.viagemnavigation.R
 import com.example.viagemnavigation.database.AppDataBase
 import com.example.viagemnavigation.model.UserViewModel
 import com.example.viagemnavigation.model.UserViewModelFactory
+import com.example.viagemnavigation.toast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Register(navController: NavController) {
+fun Register(context: Context, navController: NavController) {
     val ctx = LocalContext.current
     val db = AppDataBase.getDataBase(ctx)
     val userViewModel : UserViewModel = viewModel(
@@ -146,6 +149,7 @@ fun Register(navController: NavController) {
                 Button(
                     onClick = {
                         userViewModel.save()
+                        context.toast("Usuário cadastrado com sucesso!")
                     }, colors = ButtonDefaults.buttonColors(
                         containerColor = Color.DarkGray,
                         contentColor = Color.White
@@ -177,3 +181,5 @@ fun Register(navController: NavController) {
         }
     )
 }
+fun Context.toast(message: CharSequence) =
+    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

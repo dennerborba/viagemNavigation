@@ -28,5 +28,5 @@ interface UserDao {
     suspend fun findById(id: Long) : User?
 
     @Delete
-    fun delete(user: User)
+    suspend fun delete(user: User)
 }

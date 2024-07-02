@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.viagemnavigation.dao.UserDao
 import com.example.viagemnavigation.database.AppDataBase
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,4 +62,12 @@ class UserViewModel(val userDao: UserDao): ViewModel() {
         save()
         new()
     }
+
+    suspend fun findById(id: Long): User?{
+        val deferred: Deferred<User?> = viewModelScope.async {
+            userDao.findById(id)
+        }
+        return deferred.await()
+    }
+
 }

@@ -27,5 +27,5 @@ interface TripDao {
     fun findById(id: Long) : Trip?
 
     @Delete
-    fun delete(trip: Trip)
+    suspend fun delete(trip: Trip)
 }
