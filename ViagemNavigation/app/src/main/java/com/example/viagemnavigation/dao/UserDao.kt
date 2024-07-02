@@ -9,7 +9,6 @@ import androidx.room.Upsert
 import com.example.viagemnavigation.model.User
 import kotlinx.coroutines.flow.Flow
 
-
 @Dao
 interface UserDao {
 
@@ -26,7 +25,7 @@ interface UserDao {
     fun getAll(): Flow<List<User>>
 
     @Query("select * from user where user.id = :id")
-    fun findById(id: Long) : User?
+    suspend fun findById(id: Long) : User?
 
     @Delete
     fun delete(user: User)

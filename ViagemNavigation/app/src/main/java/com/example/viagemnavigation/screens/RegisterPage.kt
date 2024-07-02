@@ -5,19 +5,23 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -25,21 +29,22 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.viagemnavigation.R
+import com.example.viagemnavigation.database.AppDataBase
+import com.example.viagemnavigation.model.UserViewModel
+import com.example.viagemnavigation.model.UserViewModelFactory
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Register(navController: NavController) {
-    var user = remember {
-        mutableStateOf(value = "")
-    }
-    var password = remember {
-        mutableStateOf(value = "")
-    }
-    var email = remember {
-        mutableStateOf(value = "")
-    }
-    var stringPassword = remember {
+    val ctx = LocalContext.current
+    val db = AppDataBase.getDataBase(ctx)
+    val userViewModel : UserViewModel = viewModel(
+        factory = UserViewModelFactory(db))
+    val state = userViewModel.uiState.collectAsState()
+    val viewPassword = remember {
         mutableStateOf(false)
     }
 
@@ -54,8 +59,8 @@ fun Register(navController: NavController) {
                     .padding(bottom = 8.dp)
             )
             OutlinedTextField(
-                value = user.value,
-                onValueChange = { user.value = it },
+                value = state.value.username,
+                onValueChange = { userViewModel.updateUsername(it) },
                 label = {
                     Text(
                         text = "Usuário",
@@ -76,8 +81,8 @@ fun Register(navController: NavController) {
                     .padding(bottom = 8.dp)
             )
             OutlinedTextField(
-                value = email.value,
-                onValueChange = { email.value = it },
+                value = state.value.email,
+                onValueChange = { userViewModel.updateEmail(it) },
                 label = {
                     Text(
                         text = "E-mail",
@@ -99,8 +104,8 @@ fun Register(navController: NavController) {
             )
 
             OutlinedTextField(
-                value = password.value,
-                onValueChange = { password.value = it },
+                value = state.value.password,
+                onValueChange = { userViewModel.updatePassword(it) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
@@ -115,17 +120,17 @@ fun Register(navController: NavController) {
                     keyboardType = KeyboardType.Password
                 ),
                 visualTransformation =
-                if (stringPassword.value)
+                if (viewPassword.value)
                     VisualTransformation.None
                 else
                     PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(
                         onClick = {
-                            stringPassword.value = !stringPassword.value
+                            viewPassword.value = !viewPassword.value
                         }
                     ) {
-                        if (stringPassword.value)
+                        if (viewPassword.value)
                             Icon(
                                 painterResource(id = R.drawable.open_eye), ""
                             )
@@ -140,9 +145,9 @@ fun Register(navController: NavController) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Button(
                     onClick = {
-                        navController.navigate("login")
+                        userViewModel.save()
                     }, colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
+                        containerColor = Color.DarkGray,
                         contentColor = Color.White
                     ), modifier = Modifier
                         .fillMaxWidth()
@@ -154,6 +159,21 @@ fun Register(navController: NavController) {
                     )
                 }
             }
+                Button(
+                    onClick = {
+                        navController.navigate("login")
+                    }, colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.DarkGray,
+                        contentColor = Color.White
+                    ), modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp)
+                ) {
+                    Text(
+                        text = "Voltar ao login",
+                        fontSize = 18.sp
+                    )
+                }
         }
     )
 }

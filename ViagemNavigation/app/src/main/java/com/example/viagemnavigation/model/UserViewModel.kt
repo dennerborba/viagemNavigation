@@ -1,14 +1,23 @@
 package com.example.viagemnavigation.model
 
+import android.view.View
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.viagemnavigation.dao.UserDao
+import com.example.viagemnavigation.database.AppDataBase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+class UserViewModelFactory(val db: AppDataBase) : ViewModelProvider.Factory {
+    override fun <T: ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T{
+        return UserViewModel(db.userDao) as T
+    }
+}
 class UserViewModel(val userDao: UserDao): ViewModel() {
     private val _uiState = MutableStateFlow(User())
     val uiState: StateFlow<User> = _uiState.asStateFlow()
