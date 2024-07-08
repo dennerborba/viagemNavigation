@@ -61,6 +61,19 @@ class TripViewModel (val tripDao: TripDao): ViewModel() {
         }
     }
 
+    fun deleteTrip(trip: Trip){
+        viewModelScope.launch {
+            tripDao.delete(trip)
+        }
+    }
+
+    fun editTrip(id: Long){
+        viewModelScope.launch {
+            val trip = tripDao.findById(id)
+            _uiState.value = trip ?: Trip()
+        }
+    }
+
     private fun new(){
         _uiState.update{
             val copy = it.copy(id = 0,

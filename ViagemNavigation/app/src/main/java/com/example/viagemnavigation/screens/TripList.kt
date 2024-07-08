@@ -26,6 +26,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,7 +38,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -104,7 +109,7 @@ fun TripScreen(navController: NavController) {
                 contentPadding = PaddingValues(16.dp)
             ) {
                 items(items = tripItems.value) { trip ->
-                    TripCard(trip, navController)
+                    TripCard(trip, tripViewModel, navController)
                 }
             }
         }
@@ -116,7 +121,7 @@ fun TripScreen(navController: NavController) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TripCard(trip: Trip, navController: NavController) {
+fun TripCard(trip: Trip, tripViewModel: TripViewModel, navController: NavController) {
     val ctx = LocalContext.current
     val tripImage = if (trip.type == TripType.LAZER) {
         painterResource(id = R.drawable.viagem)
@@ -124,6 +129,29 @@ fun TripCard(trip: Trip, navController: NavController) {
         painterResource(id = R.drawable.negocios)
     }
     val dateFormat = SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+    var showDialog by remember { mutableStateOf(false) }
+    if (showDialog) {
+        AlertDialog(onDismissRequest = { showDialog = false },
+            title = { Text("Excluir Viagem") },
+            text = { Text("Você tem certeza que deseja excluir a viagem?") },
+            confirmButton = {
+                Button(onClick = {
+                    tripViewModel.deleteTrip(trip)
+                    showDialog = false
+                    Toast.makeText(ctx, "Viagem excluída!", Toast.LENGTH_SHORT).show()
+                }
+                ) {
+                    Text("Excluir viagem")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text(text = "Cancelar")
+                }
+            }
+        )
+    }
+
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         border = BorderStroke(1.dp, Color.Black),
@@ -132,12 +160,10 @@ fun TripCard(trip: Trip, navController: NavController) {
             .fillMaxWidth()
             .combinedClickable(
                 onClick = {
-                    Toast
-                        .makeText(ctx, "Destino: ${trip.destination}", Toast.LENGTH_SHORT)
-                        .show()
+                   showDialog = true
                 },
                 onLongClick = {
-                    navController.navigate("cadviagem")
+                    navController.navigate("cadviagem/${trip.id}")
                 }
             )
     ) {

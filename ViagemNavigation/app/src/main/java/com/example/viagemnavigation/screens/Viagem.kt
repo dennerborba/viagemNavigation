@@ -19,6 +19,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +42,7 @@ import kotlinx.coroutines.launch
 import java.util.Date
 
 @Composable
-fun CadastroViagem(navController: NavController){
+fun CadastroViagem(navController: NavController, tripId: Long? = null){
     val snackbarHostState = remember { SnackbarHostState()}
     val trip = remember {
         mutableStateOf(
@@ -54,12 +55,18 @@ fun CadastroViagem(navController: NavController){
             )
         )
     }
+
     val ctx = LocalContext.current
     val db = AppDataBase.getDataBase(ctx)
     val tripViewModel: TripViewModel = viewModel (
         factory = TripViewModelFactory(db)
     )
     val state = tripViewModel.uiState.collectAsState()
+    LaunchedEffect(tripId) {
+        tripId?.let {
+            tripViewModel.editTrip(it)
+        }
+    }
     Scaffold (
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)},
         content = { innerPadding ->

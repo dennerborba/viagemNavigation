@@ -32,5 +32,10 @@ fun Navigation(){
             NavigationBarS(navController = navController, user = user)
         }
         composable("triplist"){ TripScreen(navController = navController) }
+        composable("cadviagem/{tripId}", arguments = listOf(navArgument("tripId"){
+            type = NavType.LongType })){
+            backStackEntry -> val tripId = backStackEntry.arguments?.getLong("tripId")
+            CadastroViagem(navController = navController, tripId)
+        }
     }
 }
