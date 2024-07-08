@@ -27,6 +27,12 @@ interface UserDao {
     @Query("select * from user where user.id = :id")
     suspend fun findById(id: Long) : User?
 
+    @Query("select * from user where username = :username and password = :password")
+    suspend fun findByUserPassword(username: String, password: String): User?
+
+    @Query("select count(*) from user where username = :username")
+    suspend fun checkUsernameExists(username: String): Int
+
     @Delete
     suspend fun delete(user: User)
 }

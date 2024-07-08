@@ -148,8 +148,7 @@ fun Register(context: Context, navController: NavController) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Button(
                     onClick = {
-                        userViewModel.save()
-                        context.toast("Usuário cadastrado com sucesso!")
+                        userViewModel.save(ctx)
                     }, colors = ButtonDefaults.buttonColors(
                         containerColor = Color.DarkGray,
                         contentColor = Color.White

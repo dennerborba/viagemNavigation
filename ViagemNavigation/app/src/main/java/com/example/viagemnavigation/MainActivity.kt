@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -43,9 +44,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.viagemnavigation.components.Navigation
+import com.example.viagemnavigation.database.AppDataBase
+import com.example.viagemnavigation.model.UserViewModel
+import com.example.viagemnavigation.model.UserViewModelFactory
+import com.example.viagemnavigation.screens.toast
 import com.example.viagemnavigation.ui.theme.ViagemNavigationTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +76,12 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormLogin(context: Context, navController: NavController){
+fun FormLogin(context: Context, navController: NavController) {
+    val ctx = LocalContext.current
+    val db = AppDataBase.getDataBase(ctx)
+    val userViewModel: UserViewModel = viewModel(
+        factory = UserViewModelFactory(db)
+    )
     var username by remember {
         mutableStateOf("")
     }
@@ -77,7 +91,7 @@ fun FormLogin(context: Context, navController: NavController){
     var stringPassword by remember {
         mutableStateOf(false)
     }
-    Column (
+    Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(24.dp)
     ) {
@@ -97,7 +111,7 @@ fun FormLogin(context: Context, navController: NavController){
         )
         OutlinedTextField(
             value = username,
-            onValueChange = {username = it},
+            onValueChange = { username = it },
             label = {
                 Text(
                     text = "Usuário",
@@ -108,7 +122,7 @@ fun FormLogin(context: Context, navController: NavController){
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp)
-            )
+        )
         Text(
             text = "Senha",
             textAlign = TextAlign.Center,
@@ -118,15 +132,17 @@ fun FormLogin(context: Context, navController: NavController){
         )
         OutlinedTextField(
             value = password,
-            onValueChange = {password = it},
+            onValueChange = { password = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
             label = {
-                Text(text = "Senha",
+                Text(
+                    text = "Senha",
                     fontSize = 24.sp,
                     modifier = Modifier
-                        .padding(bottom = 12.dp))
+                        .padding(bottom = 12.dp)
+                )
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password
@@ -153,31 +169,38 @@ fun FormLogin(context: Context, navController: NavController){
             }
         )
 
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
-            Button(onClick = {
-                if (username == "admin" && password == "admin"){
-                    navController.navigate("menu/$username")
-                } else {
-                    context.toast("Usuário ou senha incorretos!")
-                }
-            }, colors = ButtonDefaults.buttonColors(
-                containerColor = Color.DarkGray, contentColor = Color.White
-            ), modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 18.dp)
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Button(
+                onClick = {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val user = userViewModel.login(username, password)
+                        if (user != null) {
+                            navController.navigate("menu/$username")
+                        } else {
+                            context.toast("Usuário ou senha incorretos!")
+                        }
+                    }
+
+                }, colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.DarkGray, contentColor = Color.White
+                ), modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 18.dp)
             ) {
-                Text(text = "Entrar",
+                Text(
+                    text = "Entrar",
                     fontSize = 18.sp
                 )
             }
         }
-        Button(onClick = {
-            navController.navigate("register")
-        }, colors = ButtonDefaults.buttonColors(
-            containerColor = Color.DarkGray, contentColor = Color.White
-        ), modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 20.dp)
+        Button(
+            onClick = {
+                navController.navigate("register")
+            }, colors = ButtonDefaults.buttonColors(
+                containerColor = Color.DarkGray, contentColor = Color.White
+            ), modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp)
         ) {
             Text(text = "Cadastrar minha conta", fontSize = 18.sp)
         }

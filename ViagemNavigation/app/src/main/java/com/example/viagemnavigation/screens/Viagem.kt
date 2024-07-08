@@ -1,6 +1,7 @@
 package com.example.viagemnavigation.components
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,17 +19,22 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.viagemnavigation.database.AppDataBase
 import com.example.viagemnavigation.model.Trip
 import com.example.viagemnavigation.model.TripType
+import com.example.viagemnavigation.model.TripViewModel
+import com.example.viagemnavigation.model.TripViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,6 +54,12 @@ fun CadastroViagem(navController: NavController){
             )
         )
     }
+    val ctx = LocalContext.current
+    val db = AppDataBase.getDataBase(ctx)
+    val tripViewModel: TripViewModel = viewModel (
+        factory = TripViewModelFactory(db)
+    )
+    val state = tripViewModel.uiState.collectAsState()
     Scaffold (
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)},
         content = { innerPadding ->
@@ -82,41 +94,38 @@ fun CadastroViagem(navController: NavController){
                     verticalArrangement = Arrangement.Center
                 ) {
                     DestinationInput(
-                        destination = trip.value.destination,
-                        onDestinationChanged = { destination -> trip.value = trip.value.copy(destination = destination) }
+                        destination = state.value.destination,
+                        onDestinationChanged = { tripViewModel.updateDestination(it) }
                     )
                     TripTypeInput(
-                        tripType = trip.value.type,
-                        onTripTypeChanged = { type -> trip.value = trip.value.copy(type = type) }
+                        tripType = state.value.type,
+                        onTripTypeChanged = { tripViewModel.updateTripType(it) }
                     )
                     ValueInput(
-                        value = formatValue(trip.value.value),
-                        onValueChanged = { newValue ->
-                            trip.value = trip.value.copy(value = newValue.toDoubleOrNull() ?: 0.0)
+                        value = formatValue(state.value.value),
+                        onValueChanged = {tripViewModel.updateValue(it.toDouble() )
                         }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     DatePickerComponent(
                         label = "Data Início",
-                        date = trip.value.startDate,
-                        onDateSelected = { newDate ->
-                            trip.value = trip.value.copy(startDate = newDate)
-                        }
+                        date = state.value.startDate,
+                        onDateSelected = { tripViewModel.updateStartDate(it) }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     DatePickerComponent(
                         label = "Data Final",
-                        date = trip.value.endDate,
-                        onDateSelected = { newDate ->
-                            trip.value = trip.value.copy(endDate = newDate)
-                        }
+                        date = state.value.endDate,
+                        onDateSelected = { tripViewModel.updateEndDate(it) }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = {
-                            Log.d("TripScreen", "Trip saved button clicked: ${trip.value}")
-                            CoroutineScope(Dispatchers.Main).launch {
-                                snackbarHostState.showSnackbar("Viagem Registrada!")
+                            if (state.value.destination == ""){
+                                Toast.makeText(ctx, "Por favor, insira um destino.", Toast.LENGTH_SHORT).show()
+                            } else {
+                                tripViewModel.save()
+                                Toast.makeText(ctx, "Viagem salva!", Toast.LENGTH_SHORT).show()
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),

@@ -1,5 +1,6 @@
 package com.example.viagemnavigation.model
 
+import android.content.Context
 import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -7,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.viagemnavigation.dao.UserDao
 import com.example.viagemnavigation.database.AppDataBase
+import com.example.viagemnavigation.screens.toast
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,54 +18,74 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class UserViewModelFactory(val db: AppDataBase) : ViewModelProvider.Factory {
-    override fun <T: ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T{
+    override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
         return UserViewModel(db.userDao) as T
     }
 }
-class UserViewModel(val userDao: UserDao): ViewModel() {
+
+class UserViewModel(val userDao: UserDao) : ViewModel() {
     private val _uiState = MutableStateFlow(User())
     val uiState: StateFlow<User> = _uiState.asStateFlow()
 
 
-    fun updateUsername(username: String){
+    fun updateUsername(username: String) {
         _uiState.update {
             it.copy(username = username)
         }
     }
-    fun updateEmail(email: String){
+
+    fun updateEmail(email: String) {
         _uiState.update {
             it.copy(email = email)
         }
     }
-    fun updatePassword(password: String){
+
+    fun updatePassword(password: String) {
         _uiState.update {
             it.copy(password = password)
         }
     }
-    private fun updateId(id: Long){
+
+    private fun updateId(id: Long) {
         _uiState.update {
             it.copy(id = id)
         }
     }
-    private fun new(){
+
+    private fun new() {
         _uiState.update {
             it.copy(id = 0, username = "", email = "", password = "")
         }
     }
-    fun save() {
+
+    fun save(context: Context) {
         viewModelScope.launch {
-            val id = userDao.upsert(uiState.value)
-            if (id > 0){
-                updateId(id)
+            val usernameExists = userDao.checkUsernameExists(uiState.value.username)
+            if (usernameExists > 0) {
+                context.toast("Este nome de usuário já existe.")
+            } else {
+                val id = userDao.upsert(uiState.value)
+                if (id > 0) {
+                    updateId(id)
+                    context.toast("Usuário cadastrado com sucesso!")
+                }
             }
         }
     }
-    fun saveNew(){
-        save()
+
+    fun saveNew(context: Context) {
+        save(context)
         new()
     }
 
-    suspend fun findById(id: Long): User?{
+    suspend fun login(username: String, password: String): User? {
+        val deferred: Deferred<User?> = viewModelScope.async {
+            userDao.findByUserPassword(username, password)
+        }
+        return deferred.await()
+    }
+
+    suspend fun findById(id: Long): User? {
         val deferred: Deferred<User?> = viewModelScope.async {
             userDao.findById(id)
         }

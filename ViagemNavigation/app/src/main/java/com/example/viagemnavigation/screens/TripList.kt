@@ -28,12 +28,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -50,15 +53,28 @@ import androidx.navigation.NavController
 import com.example.viagemnavigation.model.Trip
 import com.example.viagemnavigation.model.TripType
 import com.example.viagemnavigation.R
+import com.example.viagemnavigation.database.AppDataBase
+import com.example.viagemnavigation.model.TripViewModel
+import com.example.viagemnavigation.model.TripViewModelFactory
+import java.text.SimpleDateFormat
 import java.util.Date
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripScreen(navController: NavController) {
-    val list = listOf(
+    /* val list = listOf(
         Trip(1, "Bahamas", TripType.LAZER, Date(), Date(), 5888.0 ),
         Trip(2, "Nova York", TripType.NEGOCIOS, Date(), Date(), 20000.0),
         Trip(3, "Blumenau", TripType.LAZER, Date(), Date(), 200.0)
     )
+     */
+    val ctx = LocalContext.current
+    val db = AppDataBase.getDataBase(ctx)
+    val tripViewModel : TripViewModel = viewModel (
+        factory = TripViewModelFactory(db)
+    )
+    val tripItems = tripViewModel.getAll().collectAsState(initial = emptyList())
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -87,7 +103,7 @@ fun TripScreen(navController: NavController) {
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp)
             ) {
-                items(list) { trip ->
+                items(items = tripItems.value) { trip ->
                     TripCard(trip, navController)
                 }
             }
@@ -107,6 +123,7 @@ fun TripCard(trip: Trip, navController: NavController) {
     } else {
         painterResource(id = R.drawable.negocios)
     }
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         border = BorderStroke(1.dp, Color.Black),
@@ -155,11 +172,11 @@ fun TripCard(trip: Trip, navController: NavController) {
             Spacer(modifier = Modifier.height(6.dp))
             Column(modifier = Modifier.padding(4.dp)) {
                 Text(
-                    text = "Data de Início: ${trip.startDate}",
+                    text = "Data de Início: ${dateFormat.format(trip.startDate)}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "Data Final: ${trip.endDate}",
+                    text = "Data Final: ${dateFormat.format(trip.endDate)}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
