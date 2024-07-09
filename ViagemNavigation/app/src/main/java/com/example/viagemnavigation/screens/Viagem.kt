@@ -136,6 +136,7 @@ fun CadastroViagem(navController: NavController, tripId: Long? = null){
                             } else {
                                 tripViewModel.save()
                                 Toast.makeText(ctx, "Viagem salva!", Toast.LENGTH_SHORT).show()
+                                navController.popBackStack()
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
