@@ -63,6 +63,8 @@ class UserViewModel(val userDao: UserDao) : ViewModel() {
             val usernameExists = userDao.checkUsernameExists(uiState.value.username)
             if (usernameExists > 0) {
                 context.toast("Este nome de usuário já existe.")
+            } else if (uiState.value.email.isEmpty() || uiState.value.username.isEmpty() || uiState.value.password.isEmpty()) {
+                context.toast("Por favor, insira os dados faltantes.")
             } else {
                 val id = userDao.upsert(uiState.value)
                 if (id > 0) {
@@ -71,11 +73,6 @@ class UserViewModel(val userDao: UserDao) : ViewModel() {
                 }
             }
         }
-    }
-
-    fun saveNew(context: Context) {
-        save(context)
-        new()
     }
 
     suspend fun login(username: String, password: String): User? {

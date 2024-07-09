@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
@@ -15,6 +16,9 @@ fun AboutPage(navController: NavController){
         Text(text = "Sobre o dev: \n" +
                 "Denner de Borba \n" +
                 "20 anos \n" +
-                "https://github.com/dennerborba/viagemNavigation", fontSize = 24.sp)
+                "https://github.com/dennerborba/viagemNavigation", fontSize = 24.sp,
+            textAlign = TextAlign.Center
+
+        )
     }
 }

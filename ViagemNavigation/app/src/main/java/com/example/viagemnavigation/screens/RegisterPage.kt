@@ -37,7 +37,7 @@ import com.example.viagemnavigation.R
 import com.example.viagemnavigation.database.AppDataBase
 import com.example.viagemnavigation.model.UserViewModel
 import com.example.viagemnavigation.model.UserViewModelFactory
-import com.example.viagemnavigation.toast
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -148,8 +148,9 @@ fun Register(context: Context, navController: NavController) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Button(
                     onClick = {
-                        userViewModel.save(ctx)
-                    }, colors = ButtonDefaults.buttonColors(
+                        userViewModel.save(context)
+                    }
+                    , colors = ButtonDefaults.buttonColors(
                         containerColor = Color.DarkGray,
                         contentColor = Color.White
                     ), modifier = Modifier

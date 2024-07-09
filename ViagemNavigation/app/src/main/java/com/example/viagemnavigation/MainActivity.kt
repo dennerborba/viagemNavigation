@@ -207,6 +207,4 @@ fun FormLogin(context: Context, navController: NavController) {
     }
 }
 
-fun Context.toast(message: CharSequence) =
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
