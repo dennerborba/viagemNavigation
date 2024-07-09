@@ -12,6 +12,9 @@ import androidx.navigation.NavController
 @Composable
 fun AboutPage(navController: NavController){
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-        Text(text = "Sobre", fontSize = 24.sp)
+        Text(text = "Sobre o dev: \n" +
+                "Denner de Borba \n" +
+                "20 anos \n" +
+                "https://github.com/dennerborba/viagemNavigation", fontSize = 24.sp)
     }
 }

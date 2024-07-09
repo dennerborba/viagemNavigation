@@ -24,7 +24,7 @@ fun Navigation(){
         composable("login") { FormLogin(context = LocalContext.current, navController = navController) }
         composable("register") { Register(context = LocalContext.current, navController = navController) }
         composable("about") { AboutPage(navController = navController) }
-        composable("cadviagem") { CadastroViagem(navController = navController) }
+        composable("cadviagem") { CadastroViagem(navController = navController ) }
         composable(route= "menu/{user}", arguments = listOf(navArgument("user"){
             type = NavType.StringType })
         ) { backStackEntry ->

@@ -75,7 +75,7 @@ fun TripScreen(navController: NavController) {
      */
     val ctx = LocalContext.current
     val db = AppDataBase.getDataBase(ctx)
-    val tripViewModel : TripViewModel = viewModel (
+    val tripViewModel: TripViewModel = viewModel(
         factory = TripViewModelFactory(db)
     )
     val tripItems = tripViewModel.getAll().collectAsState(initial = emptyList())
@@ -117,8 +117,6 @@ fun TripScreen(navController: NavController) {
 }
 
 
-
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TripCard(trip: Trip, tripViewModel: TripViewModel, navController: NavController) {
@@ -130,8 +128,10 @@ fun TripCard(trip: Trip, tripViewModel: TripViewModel, navController: NavControl
     }
     val dateFormat = SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
     var showDialog by remember { mutableStateOf(false) }
+
     if (showDialog) {
-        AlertDialog(onDismissRequest = { showDialog = false },
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
             title = { Text("Excluir Viagem") },
             text = { Text("Você tem certeza que deseja excluir a viagem?") },
             confirmButton = {
@@ -139,8 +139,7 @@ fun TripCard(trip: Trip, tripViewModel: TripViewModel, navController: NavControl
                     tripViewModel.deleteTrip(trip)
                     showDialog = false
                     Toast.makeText(ctx, "Viagem excluída!", Toast.LENGTH_SHORT).show()
-                }
-                ) {
+                }) {
                     Text("Excluir viagem")
                 }
             },
@@ -160,56 +159,52 @@ fun TripCard(trip: Trip, tripViewModel: TripViewModel, navController: NavControl
             .fillMaxWidth()
             .combinedClickable(
                 onClick = {
-                   showDialog = true
+                    showDialog = true
                 },
                 onLongClick = {
                     navController.navigate("cadviagem/${trip.id}")
                 }
             )
     ) {
-        Column(modifier = Modifier.padding(4.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+        Box(
+            modifier = Modifier
+                .height(200.dp)
+                .fillMaxWidth()
+        ) {
+            Image(
+                painter = tripImage,
+                contentDescription = "Tipo Viagem",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+                    .padding(8.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                ) {
-                    Image(
-                        painter = tripImage,
-                        contentDescription = "Tipo Viagem",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                    )
-                }
-                Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = trip.destination,
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge.copy(color = Color.White),
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 5.dp)
+                        .fillMaxWidth()
+                        .padding(bottom = 4.dp)
                 )
-            }
-            Spacer(modifier = Modifier.height(6.dp))
-            Column(modifier = Modifier.padding(4.dp)) {
                 Text(
                     text = "Data de Início: ${dateFormat.format(trip.startDate)}",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall.copy(color = Color.White)
                 )
                 Text(
                     text = "Data Final: ${dateFormat.format(trip.endDate)}",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall.copy(color = Color.White)
                 )
                 Text(
                     text = "Valor: R$ ${trip.value}",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall.copy(color = Color.White)
                 )
             }
         }
     }
 }
+
