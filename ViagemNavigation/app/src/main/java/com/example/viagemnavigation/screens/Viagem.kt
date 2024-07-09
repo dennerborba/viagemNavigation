@@ -62,6 +62,7 @@ fun CadastroViagem(navController: NavController, tripId: Long? = null){
         factory = TripViewModelFactory(db)
     )
     val state = tripViewModel.uiState.collectAsState()
+
     LaunchedEffect(tripId) {
         tripId?.let {
             tripViewModel.editTrip(it)
@@ -86,7 +87,7 @@ fun CadastroViagem(navController: NavController, tripId: Long? = null){
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Cadastrar Nova Viagem",
+                            text = if (tripId == null) "Cadastrar Nova Viagem" else "Editar Viagem",
                             modifier = Modifier.weight(0.1f),
                             textAlign = TextAlign.Center
                         )
@@ -110,7 +111,9 @@ fun CadastroViagem(navController: NavController, tripId: Long? = null){
                     )
                     ValueInput(
                         value = formatValue(state.value.value),
-                        onValueChanged = {tripViewModel.updateValue(it.toDouble() )
+                        onValueChanged = {
+                            val doubleValue = it.toDoubleOrNull() ?: 0.0
+                            tripViewModel.updateValue(doubleValue)
                         }
                     )
                     Spacer(modifier = Modifier.height(8.dp))

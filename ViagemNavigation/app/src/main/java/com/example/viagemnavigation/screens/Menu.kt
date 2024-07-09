@@ -30,11 +30,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.viagemnavigation.FormLogin
 import com.example.viagemnavigation.components.CadastroViagem
-
+import com.example.viagemnavigation.model.Trip
 
 
 @Composable
-fun NavigationBarS(navController: NavController, user: String?){
+fun NavigationBarS(navController: NavController, user: String?, trip: Trip?){
     val navController = rememberNavController()
     Scaffold (
         bottomBar = { NavigationBottom(navController, user) }
@@ -42,9 +42,8 @@ fun NavigationBarS(navController: NavController, user: String?){
         NavHost(navController,
             startDestination = "home/$user",
             modifier = Modifier.padding(innerPadding)
-        ){ composable (
-                route = "home/{user}",
-                arguments = listOf(navArgument("user") { type = NavType.StringType })
+        ){
+            composable (route = "home/{user}", arguments = listOf(navArgument("user") { type = NavType.StringType })
             ) { backStackEntry ->
                 val userArg = backStackEntry.arguments?.getString("user")
                 Home(navController = navController, user = user?:userArg)
@@ -52,6 +51,12 @@ fun NavigationBarS(navController: NavController, user: String?){
             composable("triplist") { TripScreen(navController = navController) }
             composable("about") { AboutPage(navController = navController) }
             composable("cadviagem") { CadastroViagem(navController = navController)}
+            composable(route = "cadviagem/{tripId}",
+                arguments = listOf(navArgument("tripId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val tripId = backStackEntry.arguments?.getLong("tripId")
+                CadastroViagem(navController = navController, tripId = tripId)
+            }
         }
     }
 }

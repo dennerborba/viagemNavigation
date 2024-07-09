@@ -24,7 +24,7 @@ interface TripDao {
     fun getAll(): Flow<List<Trip>>
 
     @Query("select * from trip where trip.id = :id")
-    fun findById(id: Long) : Trip?
+    suspend fun findById(id: Long) : Trip?
 
     @Delete
     suspend fun delete(trip: Trip)
